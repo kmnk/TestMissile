@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Missile : MonoBehaviour {
+public class Missile : MonoBehaviour
+{
 
-    [SerializeField]
-    GameObject target;
+    public GameObject Target;
 
-    float ratio = 3000f;
+    float torqueRatio = 10000f;
+    float accelerationRatio = 200f;
 
     // カプセルの向きを補正
     Quaternion rotOffset = Quaternion.AngleAxis(90.0f, Vector3.right);
@@ -22,9 +21,8 @@ public class Missile : MonoBehaviour {
 
     void Update()
     {
-        var acceleration = transform.up * 200f;
+        var acceleration = transform.up * accelerationRatio;
 
-        // velocity の最大値を決めておかないとだんだん振幅が大きくなってしまう？
         _velocity += acceleration * Time.deltaTime;
         _position += _velocity * Time.deltaTime;
         transform.position = _position;
@@ -32,13 +30,13 @@ public class Missile : MonoBehaviour {
 
     void FixedUpdate()
     {
-        var diff = target.transform.position - transform.position;
+        var diff = Target.transform.position - transform.position;
 
         var targetRot = Quaternion.LookRotation(diff) * rotOffset;
 
         var q = targetRot * Quaternion.Inverse(transform.rotation);
 
-        var torque = new Vector3(q.x, q.y, q.z) * ratio;
+        var torque = new Vector3(q.x, q.y, q.z) * torqueRatio;
 
         GetComponent<Rigidbody>().AddTorque(torque);
     }
